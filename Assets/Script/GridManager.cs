@@ -17,16 +17,18 @@ public class GridManager : MonoBehaviour
 
     public Vector2 gridOffset;
 
+    
     [SerializeField]
-    private GameManager gameManager;
+    private UpgradeManager upgradeManager;
 
     GameObject gridHolder;
 
     void Start()
     {
         allTiles = new Tile[width, height];
-        if(gameManager == null)
-            gameManager = FindObjectOfType<GameManager>();
+        if(upgradeManager == null)
+            upgradeManager = FindObjectOfType<UpgradeManager>();
+        
         GenerateGrid();
     }
 
@@ -187,19 +189,26 @@ public class GridManager : MonoBehaviour
     }
 
     private void ClearMatches(List<Tile> matchedTiles)
+{
+    
+    if (matchedTiles.Count >= 4)
     {
-       
-        foreach (Tile tile in matchedTiles)
-        {
-            if (tile != null)
-            {
-                allTiles[tile.x, tile.y] = null;
-                Destroy(tile.gameObject);
-            }
-        }
-        gameManager.AddCoins(matchedTiles.Count * coinsPerMatch);
-        
+        upgradeManager.AddUpgradeToken();
+        Debug.Log("Mega Match! Upgrade Token granted.");
     }
+
+    foreach (Tile tile in matchedTiles)
+    {
+        if (tile != null)
+        {
+            allTiles[tile.x, tile.y] = null;
+            Destroy(tile.gameObject);
+        }
+    }
+
+    GameManager.instance.AddCoins(matchedTiles.Count * coinsPerMatch);
+    Debug.Log($"Awarded {matchedTiles.Count * coinsPerMatch} coins!");
+}
 
     
     private IEnumerator CollapseAndRefill()

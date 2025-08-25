@@ -12,14 +12,18 @@ public class Enemy : MonoBehaviour
     public void SetWaypoints(Transform[] pathWaypoints)
     {
         waypoints = pathWaypoints;
-        transform.position = waypoints[0].position; // Teleport to the start
+        transform.position = waypoints[0].position; 
     }
-
+    public void Setup(float newHealth, float newSpeed)
+    {
+        health = newHealth;
+        speed = newSpeed;
+    }
     void Update()
     {
         if (waypoints == null) return;
 
-        // Move towards the current waypoint
+        
         transform.position = Vector2.MoveTowards(transform.position, waypoints[waypointIndex].position, speed * Time.deltaTime);
 
         
@@ -28,8 +32,8 @@ public class Enemy : MonoBehaviour
             waypointIndex++;
             if (waypointIndex >= waypoints.Length)
             {
-                //Reached End
-                FindObjectOfType<GameManager>().TakeBaseDamage(1);
+                
+                GameManager.instance.TakeBaseDamage(1);
                 Destroy(gameObject);
             }
         }

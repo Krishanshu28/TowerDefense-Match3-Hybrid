@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro; // Add this line to use TextMeshPro
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
 
     [Header("Game Over UI")]
     public GameObject gameOverPanel;
+    public TMP_Text gameOverText; 
+    public GameObject victoryPanel; 
 
     public void UpdateCoins(int amount)
     {
@@ -30,4 +32,17 @@ public class UIManager : MonoBehaviour
     {
         gameOverPanel.SetActive(true);
     }
+     public void ShowGameOver(bool didWin)
+    {
+        gameOverPanel.SetActive(true);
+        if (didWin)
+        {
+            gameOverText.text = "VICTORY!";
+        }
+        else
+        {
+            gameOverText.text = "DEFEAT!";
+        }
+    }
+    
 }

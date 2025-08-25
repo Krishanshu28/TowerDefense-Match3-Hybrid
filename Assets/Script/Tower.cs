@@ -13,10 +13,31 @@ public class Tower : MonoBehaviour
     private Transform target;
     private float fireCountdown = 0f;
 
+    private int level = 1;
+    private UpgradeManager upgradeManager;
+    private SpriteRenderer spriteRenderer;
+
     void Start()
     {
+        if(upgradeManager == null)
+            upgradeManager = FindObjectOfType<UpgradeManager>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         
         InvokeRepeating("UpdateTarget", 0f, 0.5f);
+    }
+    private void OnMouseDown()
+    {
+        upgradeManager.ApplyUpgrade(this);
+    }
+     public void Upgrade()
+    {
+        level++;
+        
+        damage *= 1.5f;
+        range += 0.5f;
+
+        transform.localScale *= 1.1f;
+        spriteRenderer.color = Color.yellow;
     }
 
     

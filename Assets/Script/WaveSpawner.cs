@@ -3,18 +3,19 @@ using UnityEngine;
 
 public class WaveSpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;
+    [Header("Wave Configuration")]
+    public Wave[] waves; 
     public Transform[] waypoints;
-
-    [Header("Wave Settings")]
-    public int numberOfWaves = 3;
-    public int enemiesPerWave = 5;
     public float timeBetweenWaves = 5f;
 
-    private int currentWave = 1;
+    [Header("Required Setup")]
+    public GameObject enemyPrefab;
+
+    private int currentWaveIndex = 0;
 
     [SerializeField]
     private UIManager uiManager;
+    private bool isSpawning = false;
 
     void Start()
     {
@@ -25,24 +26,36 @@ public class WaveSpawner : MonoBehaviour
 
     IEnumerator SpawnAllWaves()
     {
-        for (currentWave = 1; currentWave <= numberOfWaves; currentWave++)
+        
+        for (currentWaveIndex = 0; currentWaveIndex < waves.Length; currentWaveIndex++)
         {
-            uiManager.UpdateWave(currentWave, numberOfWaves);
-            yield return StartCoroutine(SpawnWave());
+            uiManager.UpdateWave(currentWaveIndex + 1, waves.Length);
+            yield return StartCoroutine(SpawnWave(waves[currentWaveIndex]));
             yield return new WaitForSeconds(timeBetweenWaves);
         }
 
         
-        Debug.Log("YOU WIN!");
+        while (GameObject.FindGameObjectWithTag("Enemy") != null)
+        {
+            yield return null;
+        }
+
+        
+        GameManager.instance.HandleVictory();
     }
 
-    IEnumerator SpawnWave()
+    IEnumerator SpawnWave(Wave wave)
     {
-        for (int i = 0; i < enemiesPerWave; i++)
+        for (int i = 0; i < wave.enemyCount; i++)
         {
             GameObject newEnemyObj = Instantiate(enemyPrefab);
-            newEnemyObj.GetComponent<Enemy>().SetWaypoints(waypoints);
-            yield return new WaitForSeconds(1f); 
+            Enemy enemy = newEnemyObj.GetComponent<Enemy>();
+
+            
+            enemy.SetWaypoints(waypoints);
+            enemy.Setup(wave.enemyHealth, wave.enemySpeed);
+
+            yield return new WaitForSeconds(wave.spawnInterval);
         }
     }
 }

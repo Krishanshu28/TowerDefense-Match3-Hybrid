@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -6,40 +7,55 @@ public class GameManager : MonoBehaviour
     public int baseHealth = 10;
 
     [SerializeField]
-    private UIManager uiManager; 
+    private UIManager uiManager;
+
+    public static GameManager instance;
 
     void Start()
     {
-        if(uiManager == null)
-            uiManager = FindObjectOfType<UIManager>(); 
+        if (instance == null)
+            instance = this;
+        if (uiManager == null)
+                uiManager = FindObjectOfType<UIManager>();
 
-        // Update the UI at the start 
-        uiManager.UpdateCoins(playerCoins);      
-        uiManager.UpdateHealth(baseHealth);      
+        
+        uiManager.UpdateCoins(playerCoins);
+        uiManager.UpdateHealth(baseHealth);
     }
 
     public void AddCoins(int amount)
     {
         playerCoins += amount;
-        uiManager.UpdateCoins(playerCoins); 
+        uiManager.UpdateCoins(playerCoins);
     }
 
     public void SpendCoins(int amount)
     {
         playerCoins -= amount;
-        uiManager.UpdateCoins(playerCoins); 
+        uiManager.UpdateCoins(playerCoins);
     }
 
-    public void TakeBaseDamage(int amount)
+     public void TakeBaseDamage(int amount)
     {
         baseHealth -= amount;
-        uiManager.UpdateHealth(baseHealth); 
+        uiManager.UpdateHealth(baseHealth);
 
         if (baseHealth <= 0)
         {
-            baseHealth = 0; 
-            uiManager.ShowGameOver();
-            Time.timeScale = 0f; 
+            baseHealth = 0;
+            uiManager.ShowGameOver(false); 
+            Time.timeScale = 0f;
         }
+    }
+
+    public void HandleVictory()
+    {
+        uiManager.ShowGameOver(true); 
+        Time.timeScale = 0f;
+    }
+
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(0);
     }
 }

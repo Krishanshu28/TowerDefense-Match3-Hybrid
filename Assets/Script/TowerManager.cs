@@ -1,38 +1,69 @@
 using UnityEngine;
+using UnityEngine.UI; 
+using TMPro;
 
 public class TowerManager : MonoBehaviour
 {
+    [Header("Tower Settings")]
     public GameObject towerPrefab;
     public int towerCost = 100;
 
-    [SerializeField]
-    private GameManager gameManager;
+    [Header("UI Setup")]
+    public GameObject buildMenuPanel;
+    public Button towerBuildButton;
+
+
+    private TowerSlot selectedSlot;
 
     void Start()
     {
-        
-        if(gameManager == null)
-            gameManager = FindObjectOfType<GameManager>();
+        buildMenuPanel.SetActive(false);
     }
-
     
-    public void PlaceTower(Transform slotTransform)
+    public void OpenBuildMenu(TowerSlot slot)
     {
         
-        if (gameManager.playerCoins >= towerCost)
+        selectedSlot = slot;
+
+        
+        buildMenuPanel.transform.position = Camera.main.WorldToScreenPoint(slot.transform.position);
+        buildMenuPanel.SetActive(true);
+
+        
+        UpdateBuildButton();
+    }
+
+    private void UpdateBuildButton()
+    {
+        
+        if (GameManager.instance.playerCoins < towerCost)
         {
-            
-            gameManager.SpendCoins(towerCost);
-
-            
-            Instantiate(towerPrefab, slotTransform.position, Quaternion.identity);
-
-            
-            slotTransform.gameObject.SetActive(false);
+            towerBuildButton.interactable = false;
         }
         else
         {
-            Debug.Log("Not enough coins!");
+            towerBuildButton.interactable = true;
         }
+    }
+
+    
+    public void BuildTower()
+    {
+        if (GameManager.instance.playerCoins >= towerCost)
+        {
+            GameManager.instance.SpendCoins(towerCost);
+            Instantiate(towerPrefab, selectedSlot.transform.position, Quaternion.identity);
+            
+            
+            selectedSlot.gameObject.SetActive(false);
+            CloseBuildMenu();
+        }
+    }
+
+    
+    public void CloseBuildMenu()
+    {
+        buildMenuPanel.SetActive(false);
+        selectedSlot = null;
     }
 }
